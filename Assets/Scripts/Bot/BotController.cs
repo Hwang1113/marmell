@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class BotController : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class BotController : MonoBehaviour
     public float groundCheckDistance = 0.3f; // 바닥 체크 거리
     public bool isGrounded; // 땅에 있는지 확인
     public bool hasJumped = false; // 점프가 시작되었는지 확인하는 변수
+    public bool isDown = false; // "Down" 상태 확인 변수
 
     private CharacterController controller;
     private Animator animator;
@@ -17,6 +19,7 @@ public class BotController : MonoBehaviour
     private Transform playerTransform; // 플레이어의 Transform
     private Vector3 jumpDirection; // 점프 시작 시의 이동 방향을 저장하는 변수
     private int jumpBoostpower = 2; // 점프했을때 곱하는 가속
+
     void Start()
     {
         // 필요한 컴포넌트 가져오기
@@ -29,8 +32,11 @@ public class BotController : MonoBehaviour
 
     void Update()
     {
-        // 봇의 이동 처리
-        MoveBot();
+        // 다운 상태가 아닐 때만 이동 처리
+        if (!isDown)
+        {
+            MoveBot();
+        }
 
         // 애니메이터 파라미터 업데이트
         UpdateAnimator();
@@ -38,8 +44,11 @@ public class BotController : MonoBehaviour
         // 점프 처리
         JumpCheck();
 
-        // 실제 이동: CharacterController.Move()로 이동
-        controller.Move(velocity * Time.deltaTime);
+        if (!isDown)
+        {
+            // 실제 이동: CharacterController.Move()로 이동
+            controller.Move(velocity * Time.deltaTime);
+        }
     }
 
     void MoveBot()
@@ -53,6 +62,22 @@ public class BotController : MonoBehaviour
         if (distanceToPlayer <= jumpDistance && isGrounded && !hasJumped)
         {
             Jump();
+        }
+
+        // X 축 회전값을 이용하여 캐릭터 기울어진 정도 계산
+        {
+            // X 회전값을 0 ~ 180도 사이로 제한 (기울어짐만 계산)
+            float tilt = Mathf.Abs(transform.rotation.eulerAngles.x);
+
+            // X 축 회전이 180도를 넘으면 180도에 고정 (기울어짐 값은 최대 90도만 반영)
+            if (tilt > 180f)
+            {
+                tilt = 360f - tilt;  // 180도 이후로 기울어지면 그 값을 보정하여 0 ~ 90도 범위로 제한
+            }
+
+            // 회전 값에 따른 height 값 조정 (0 ~ 90도에서 height가 줄어듬)
+            float newHeight = Mathf.Lerp(1.5f, 0.5f, tilt / 90f);
+            controller.height = newHeight;
         }
 
         // 플레이어를 향해 이동 (카메라와는 관계 없이, 플레이어의 방향으로만)
@@ -92,7 +117,7 @@ public class BotController : MonoBehaviour
 
     void Jump()
     {
-        // 점프 동작: jumpHeight를 이용해 점프 속도 계산
+        // 점프 동작: jumpHeight를 이용해 점프 속도 계산 
         if (isGrounded)
         {
             velocity.y = jumpHeight;  // 점프 속도 설정
@@ -109,7 +134,7 @@ public class BotController : MonoBehaviour
         isGrounded = controller.isGrounded;
 
         // 바닥에 닿으면 Y 속도를 초기화하고 점프 상태 종료
-        if (isGrounded && velocity.y < 1) // velocity.y <= 0 이였으나 버그 생겨서 바꿈
+        if (isGrounded && velocity.y < 1) // velocity.y <= 0 이었으나 버그 생겨서 바꿈
         {
             velocity.y = -2f;  // 바닥에 닿으면 아래로 밀어넣음
             hasJumped = false;  // 점프 완료
@@ -117,12 +142,6 @@ public class BotController : MonoBehaviour
             // 점프 후 원래 플레이어 방향으로 이동하도록 `jumpDirection` 리셋
             jumpDirection = Vector3.zero;
         }
-    }
-
-    bool IsGroundedByRaycast()
-    {
-        // 바닥에 닿아 있는지 Raycast로 확인
-        return Physics.Raycast(transform.position, Vector3.down, groundCheckDistance);
     }
 
     void UpdateAnimator()
@@ -140,6 +159,71 @@ public class BotController : MonoBehaviour
         {
             animator.SetBool("IsJumping", true);
         }
+
+        // "Down" 상태 체크
+        if (isDown)
+        {
+            animator.SetBool("IsDown", true);
+        }
+        else
+        {
+            animator.SetBool("IsDown", false);
+        }
+    }
+
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        // 충돌한 객체의 Collider를 얻을 수 있음
+        Collider otherCollider = hit.collider;
+
+        // 특정 태그를 가진 객체와 충돌 시 처리
+        if (otherCollider.CompareTag("Choco"))
+        {
+            //Debug.Log("Choco와 충돌!");
+
+            // 애니메이터 상태를 "Down"으로 바꾸고
+            animator.SetBool("IsDown", true);
+            isDown = true;  // Down 상태 설정
+
+            // 점프 상태 해제
+            hasJumped = false;
+            // X, Y, Z 모두 0으로 설정하여 이동을 완전히 멈춤
+            velocity = Vector3.zero;
+
+            // 2초 동안 걷기 상태로 유지
+            StartCoroutine(WalkWhileDownState());
+
+            // 2초 후 복구
+            StartCoroutine(RecoverFromDownState());
+        }
+    }
+
+    // 다운 상태에서 2초 동안 걷기 상태로 유지
+    IEnumerator WalkWhileDownState()
+    {
+        animator.SetBool("IsWalking", true);  // 걷기 애니메이션 활성화
+
+        // Down 상태에서는 일정 속도(느리게)를 설정
+        velocity = new Vector3(0.5f, velocity.y, 0);  // 느리게 걷는 속도
+
+        // 2초 동안 걷기 상태 유지
+        yield return new WaitForSeconds(2f);
+
+        // 걷기 상태 종료
+        animator.SetBool("IsWalking", false);
+    }
+
+    IEnumerator RecoverFromDownState()
+    {
+        yield return new WaitForSeconds(2f);  // 2초 대기
+
+        // 다운 상태 복구
+        isDown = false;
+        animator.SetBool("IsDown", false);
+
+        // 복구 후, 이동을 위한 velocity를 초기화 (Y축만 남기지 않음)
+        velocity = Vector3.zero;  // X, Y, Z 모두 0으로 설정하여 이전 이동이 없도록 함
+
+        // 이후 이동을 계속하도록 기존의 MoveBot()과 연계될 수 있도록 `velocity` 설정
     }
 }
-
