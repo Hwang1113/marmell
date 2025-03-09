@@ -4,7 +4,7 @@ public class BotController : MonoBehaviour
 {
     public float moveSpeed = 5f; // 기본 이동 속도
     public float sprintSpeed = 6f; // 달리기 속도
-    public float jumpHeight = 5f; // 점프 높이
+    public float jumpHeight = 3f; // 점프 높이
     public float followDistance = 2.5f; // 플레이어와의 추적 거리
     public float jumpDistance = 4f; // 점프 거리 (플레이어가 가까워졌을 때 점프)
     public float groundCheckDistance = 0.3f; // 바닥 체크 거리
@@ -16,7 +16,7 @@ public class BotController : MonoBehaviour
     private Vector3 velocity; // 속도 벡터
     private Transform playerTransform; // 플레이어의 Transform
     private Vector3 jumpDirection; // 점프 시작 시의 이동 방향을 저장하는 변수
-    private int jumpBoostpower = 3; // 점프했을때 곱하는 가속
+    private int jumpBoostpower = 2; // 점프했을때 곱하는 가속
     void Start()
     {
         // 필요한 컴포넌트 가져오기
@@ -109,7 +109,7 @@ public class BotController : MonoBehaviour
         isGrounded = controller.isGrounded;
 
         // 바닥에 닿으면 Y 속도를 초기화하고 점프 상태 종료
-        if (isGrounded && velocity.y < 1)
+        if (isGrounded && velocity.y < 1) // velocity.y <= 0 이였으나 버그 생겨서 바꿈
         {
             velocity.y = -2f;  // 바닥에 닿으면 아래로 밀어넣음
             hasJumped = false;  // 점프 완료
