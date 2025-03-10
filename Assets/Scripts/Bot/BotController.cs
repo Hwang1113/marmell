@@ -215,15 +215,39 @@ public class BotController : MonoBehaviour
 
     IEnumerator RecoverFromDownState()
     {
-        yield return new WaitForSeconds(2f);  // 2초 대기
+        // 2초 대기
+        yield return new WaitForSeconds(2f);
 
         // 다운 상태 복구
         isDown = false;
         animator.SetBool("IsDown", false);
 
-        // 복구 후, 이동을 위한 velocity를 초기화 (Y축만 남기지 않음)
-        velocity = Vector3.zero;  // X, Y, Z 모두 0으로 설정하여 이전 이동이 없도록 함
+        // 복구 후 이동 가능하도록 velocity 초기화 (Y축은 유지)
+        velocity = new Vector3(0, velocity.y, 0);  // Y축 속도는 유지하며 X, Z는 복구
 
-        // 이후 이동을 계속하도록 기존의 MoveBot()과 연계될 수 있도록 `velocity` 설정
+        // 이동 재개
+        // 이후 기존의 MoveBot() 함수가 계속 호출되도록 함
+    }
+    void OnParticleCollision(GameObject other)
+    {
+        // 파티클 시스템의 충돌 대상이 "ParticleTag" 태그를 가진 오브젝트인 경우
+        if (other.CompareTag("Choco"))
+        {
+            // 이미 "Down" 상태인 경우 충돌 처리 안 함
+            if (isDown) return;
+
+            // "Down" 상태로 변경
+            isDown = true;
+            animator.SetBool("IsDown", true);
+
+            // 이동 멈추기
+            velocity = Vector3.zero;
+
+            // 점프 상태 해제
+            hasJumped = false;
+
+            // 2초 후 복구 (걷기 상태를 유지하며 복구)
+            StartCoroutine(RecoverFromDownState());
+        }
     }
 }

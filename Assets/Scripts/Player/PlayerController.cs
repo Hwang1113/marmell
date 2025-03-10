@@ -68,5 +68,5 @@ public class PlayerController : MonoBehaviour
         // 이동 상태 업데이트: Speed 파라미터 값 설정
         float speed = new Vector3(velocity.x, 0, velocity.z).magnitude;
         animator.SetFloat("Speed", speed);
-    }
+    }       
 }

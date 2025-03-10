@@ -36,7 +36,7 @@ public class SpaceBarrier : MonoBehaviour
         {
             // scale을 0에서 2로 점진적으로 증가
             elapsedTime += Time.deltaTime;
-            float scaleValue = Mathf.Lerp(0f, 2f, elapsedTime / scaleDuration);
+            float scaleValue = Mathf.Lerp(0f, 2f, Mathf.Sqrt(elapsedTime / scaleDuration));
 
             // 2에 도달하면 바로 0으로 돌아가도록 처리
             if (scaleValue >= 2f)
