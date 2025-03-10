@@ -64,22 +64,6 @@ public class BotController : MonoBehaviour
             Jump();
         }
 
-        // X 축 회전값을 이용하여 캐릭터 기울어진 정도 계산
-        {
-            // X 회전값을 0 ~ 180도 사이로 제한 (기울어짐만 계산)
-            float tilt = Mathf.Abs(transform.rotation.eulerAngles.x);
-
-            // X 축 회전이 180도를 넘으면 180도에 고정 (기울어짐 값은 최대 90도만 반영)
-            if (tilt > 180f)
-            {
-                tilt = 360f - tilt;  // 180도 이후로 기울어지면 그 값을 보정하여 0 ~ 90도 범위로 제한
-            }
-
-            // 회전 값에 따른 height 값 조정 (0 ~ 90도에서 height가 줄어듬)
-            float newHeight = Mathf.Lerp(1.5f, 0.5f, tilt / 90f);
-            controller.height = newHeight;
-        }
-
         // 플레이어를 향해 이동 (카메라와는 관계 없이, 플레이어의 방향으로만)
         Vector3 directionToPlayer = (playerTransform.position - transform.position).normalized;
 
@@ -171,32 +155,6 @@ public class BotController : MonoBehaviour
         }
     }
 
-    void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        // 충돌한 객체의 Collider를 얻을 수 있음
-        Collider otherCollider = hit.collider;
-
-        // 특정 태그를 가진 객체와 충돌 시 처리
-        if (otherCollider.CompareTag("Choco"))
-        {
-            //Debug.Log("Choco와 충돌!");
-
-            // 애니메이터 상태를 "Down"으로 바꾸고
-            animator.SetBool("IsDown", true);
-            isDown = true;  // Down 상태 설정
-
-            // 점프 상태 해제
-            hasJumped = false;
-            // X, Y, Z 모두 0으로 설정하여 이동을 완전히 멈춤
-            velocity = Vector3.zero;
-
-            // 2초 동안 걷기 상태로 유지
-            StartCoroutine(WalkWhileDownState());
-
-            // 2초 후 복구
-            StartCoroutine(RecoverFromDownState());
-        }
-    }
 
     // 다운 상태에서 2초 동안 걷기 상태로 유지
     IEnumerator WalkWhileDownState()
@@ -228,6 +186,33 @@ public class BotController : MonoBehaviour
         // 이동 재개
         // 이후 기존의 MoveBot() 함수가 계속 호출되도록 함
     }
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        // 충돌한 객체의 Collider를 얻을 수 있음
+        Collider otherCollider = hit.collider;
+
+        // 특정 태그를 가진 객체와 충돌 시 처리
+        if (otherCollider.CompareTag("Choco"))
+        {
+            //Debug.Log("Choco와 충돌!");
+
+            // 애니메이터 상태를 "Down"으로 바꾸고
+            animator.SetBool("IsDown", true);
+            isDown = true;  // Down 상태 설정
+
+            // 점프 상태 해제
+            hasJumped = false;
+            // X, Y, Z 모두 0으로 설정하여 이동을 완전히 멈춤
+            velocity = Vector3.zero;
+
+            // 2초 동안 걷기 상태로 유지
+            StartCoroutine(WalkWhileDownState());
+
+            // 2초 후 복구
+            StartCoroutine(RecoverFromDownState());
+        }
+    }
+
     void OnParticleCollision(GameObject other)
     {
         // 파티클 시스템의 충돌 대상이 "ParticleTag" 태그를 가진 오브젝트인 경우

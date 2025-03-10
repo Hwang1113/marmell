@@ -1,5 +1,13 @@
 fileFormatVersion: 2
 guid: 41f081d5c6d286c47a33bed3f84de79a
+AssetOrigin:
+  serializedVersion: 1
+  productId: 262897
+  packageName: Mini Simple Characters | Skeleton | Free Demo
+  packageVersion: 1.0
+  assetPath: Assets/Mini Simple Characters Skeleton Demo/Models/mini simple skeleton
+    demo.fbx
+  uploadId: 606480
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -16,8 +24,6 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -226,14 +232,6 @@ ModelImporter:
         value: {x: 0, y: 0, z: 0}
         length: 0
         modified: 0
-    - boneName: Spine2
-      humanName: UpperChest
-      limit:
-        min: {x: 0, y: 0, z: 0}
-        max: {x: 0, y: 0, z: 0}
-        value: {x: 0, y: 0, z: 0}
-        length: 0
-        modified: 0
     skeleton:
     - name: mini simple skeleton demo(Clone)
       parentName: 
@@ -429,11 +427,3 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 262897
-  packageName: Mini Simple Characters | Skeleton | Free Demo
-  packageVersion: 1.0
-  assetPath: Assets/Mini Simple Characters Skeleton Demo/Models/mini simple skeleton
-    demo.fbx
-  uploadId: 606480

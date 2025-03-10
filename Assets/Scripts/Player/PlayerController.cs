@@ -4,6 +4,8 @@ public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 5f; // 기본 이동 속도
     public float sprintSpeed = 10f; // 달리기 속도
+    public Transform upperBody; // 상체 본 (예: Spine 또는 Chest)
+    public float rotationSpeed = 5f; // 상체 회전 속도
 
     private CharacterController controller;
     private Animator animator;
@@ -22,6 +24,9 @@ public class PlayerController : MonoBehaviour
     {
         // 이동 처리
         MovePlayer();
+
+        // 상체 회전 처리
+        HandleUpperBodyRotation();
 
         // 애니메이터 파라미터 업데이트
         UpdateAnimator();
@@ -68,5 +73,24 @@ public class PlayerController : MonoBehaviour
         // 이동 상태 업데이트: Speed 파라미터 값 설정
         float speed = new Vector3(velocity.x, 0, velocity.z).magnitude;
         animator.SetFloat("Speed", speed);
-    }       
+
+        // 클릭했을 때 ChocoShot 상태로 전환
+        if (Input.GetMouseButtonDown(0)) // 마우스 왼쪽 버튼 클릭
+        {
+            animator.SetTrigger("ChocoShot"); // ChocoShot 트리거 설정
+        }
+    }
+
+    void HandleUpperBodyRotation()
+    {
+        // 클릭했을 때 상체 회전
+        if (Input.GetMouseButtonDown(0)) // 마우스 왼쪽 버튼 클릭
+        {
+            // 카메라 방향으로 회전
+            Vector3 directionToCamera = mainCamera.transform.forward;
+            directionToCamera.y = 0f; // 수평 회전만 적용
+            Quaternion targetRotation = Quaternion.LookRotation(directionToCamera);
+            upperBody.rotation = Quaternion.Slerp(upperBody.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
+    }
 }

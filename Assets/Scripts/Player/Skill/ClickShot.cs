@@ -2,22 +2,20 @@ using UnityEngine;
 
 public class ClickShot : MonoBehaviour
 {
-    private ParticleSystem particleSystem;  // ÆÄÆ¼Å¬ ½Ã½ºÅÛÀ» ÂüÁ¶ÇÒ º¯¼ö
-
+    public ParticleSystem chocoParticleSystem;
     void Start()
     {
-        // ÇöÀç ¿ÀºêÁ§Æ®¿¡ ÀÖ´Â ParticleSystem ÄÄÆ÷³ÍÆ®¸¦ ÀÚµ¿À¸·Î Ã£À½
-        particleSystem = GetComponent<ParticleSystem>();
+        chocoParticleSystem = GetComponent<ParticleSystem>();
     }
 
-    void Update()
+        void Update()
     {
-        // ¸¶¿ì½º ¿ÞÂÊ ¹öÆ° Å¬¸¯ ½Ã ÆÄÆ¼Å¬ ½ÇÇà
-        if (Input.GetMouseButtonDown(0))  // 0Àº ÁÂÅ¬¸¯À» ÀÇ¹Ì
+        // ï¿½ï¿½ï¿½ì½º ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° Å¬ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½ï¿½ï¿½
+        if (Input.GetMouseButtonDown(0))  // 0ï¿½ï¿½ ï¿½ï¿½Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½Ç¹ï¿½
         {
-            if (particleSystem != null)
+            if (GetComponent<ParticleSystem>() != null)
             {
-                particleSystem.Play();  // ÆÄÆ¼Å¬ ½ÇÇà
+                GetComponent<ParticleSystem>().Play();  // ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½ï¿½ï¿½
             }
         }
     }
