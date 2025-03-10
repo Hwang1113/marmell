@@ -12,6 +12,7 @@ public class BotController : MonoBehaviour
     public bool isGrounded; // 땅에 있는지 확인
     public bool hasJumped = false; // 점프가 시작되었는지 확인하는 변수
     public bool isDown = false; // "Down" 상태 확인 변수
+    public MaterialSwitcherController M_SwitchControl;
 
     private CharacterController controller;
     private Animator animator;
@@ -19,13 +20,16 @@ public class BotController : MonoBehaviour
     private Transform playerTransform; // 플레이어의 Transform
     private Vector3 jumpDirection; // 점프 시작 시의 이동 방향을 저장하는 변수
     private int jumpBoostpower = 2; // 점프했을때 곱하는 가속
+    private int colCnt = 0; // 초코랑 충돌한 횟수 4번 충돌하면 초코멜로
+    private int maxColCnt = 4;
+
 
     void Start()
     {
         // 필요한 컴포넌트 가져오기
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
-
+        M_SwitchControl = GetComponent<MaterialSwitcherController>();
         // 플레이어의 Transform을 찾기
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
     }
@@ -196,6 +200,16 @@ public class BotController : MonoBehaviour
         {
             //Debug.Log("Choco와 충돌!");
 
+            //메테리얼 한 부위 바꾸고 체크 
+            ChocoColCntPlusCheck();
+            if (colCnt < maxColCnt)
+            {
+                // 2초 동안 걷기 상태로 유지 멈춤
+                StopCoroutine(WalkWhileDownState());
+
+                // 2초 후 복구 멈춤
+                StopCoroutine(RecoverFromDownState());
+            }
             // 애니메이터 상태를 "Down"으로 바꾸고
             animator.SetBool("IsDown", true);
             isDown = true;  // Down 상태 설정
@@ -204,22 +218,29 @@ public class BotController : MonoBehaviour
             hasJumped = false;
             // X, Y, Z 모두 0으로 설정하여 이동을 완전히 멈춤
             velocity = Vector3.zero;
+            if (colCnt < maxColCnt)
+            {
+                // 2초 동안 걷기 상태로 유지
+                StartCoroutine(WalkWhileDownState());
 
-            // 2초 동안 걷기 상태로 유지
-            StartCoroutine(WalkWhileDownState());
-
-            // 2초 후 복구
-            StartCoroutine(RecoverFromDownState());
+                // 2초 후 복구
+                StartCoroutine(RecoverFromDownState());
+            }
         }
     }
 
     void OnParticleCollision(GameObject other)
     {
-        // 파티클 시스템의 충돌 대상이 "ParticleTag" 태그를 가진 오브젝트인 경우
+        // 파티클 시스템의 충돌 대상이 "Choco" 태그를 가진 오브젝트인 경우
         if (other.CompareTag("Choco"))
         {
-            // 이미 "Down" 상태인 경우 충돌 처리 안 함
-            if (isDown) return;
+            //메테리얼 한 부위 바꾸고 체크 
+            ChocoColCntPlusCheck();
+            if (colCnt < maxColCnt)
+            {
+                // 2초 후 복구 멈춤
+                StopCoroutine(RecoverFromDownState());
+            }
 
             // "Down" 상태로 변경
             isDown = true;
@@ -230,9 +251,21 @@ public class BotController : MonoBehaviour
 
             // 점프 상태 해제
             hasJumped = false;
+            if (colCnt < maxColCnt)
+            {
+                // 2초 후 복구 (걷기 상태를 유지하며 복구)
+                StartCoroutine(RecoverFromDownState());
+            }
 
-            // 2초 후 복구 (걷기 상태를 유지하며 복구)
-            StartCoroutine(RecoverFromDownState());
+        }
+    }
+
+    void ChocoColCntPlusCheck()
+    {
+        if (colCnt < maxColCnt)
+        {
+            colCnt++;//초코충돌 발생할때마다 카운트 추가
+            M_SwitchControl.SwitchNextMaterial();
         }
     }
 }
