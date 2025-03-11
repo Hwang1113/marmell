@@ -13,6 +13,8 @@ public class BotController : MonoBehaviour
     public bool hasJumped = false; // 점프가 시작되었는지 확인하는 변수
     public bool isDown = false; // "Down" 상태 확인 변수
     public MaterialSwitcherController M_SwitchControl;
+    public float minHeight = 0f;  // 최소 height 값
+    public float maxHeight = 1.5f;  // 최대 height 값
 
     private CharacterController controller;
     private Animator animator;
@@ -22,7 +24,6 @@ public class BotController : MonoBehaviour
     private int jumpBoostpower = 2; // 점프했을때 곱하는 가속
     private int colCnt = 0; // 초코랑 충돌한 횟수 4번 충돌하면 초코멜로
     private int maxColCnt = 4;
-
 
     void Start()
     {
@@ -40,6 +41,8 @@ public class BotController : MonoBehaviour
         if (!isDown)
         {
             MoveBot();
+            //컨트롤러 높이 조정
+            AdjustHeightBasedOnTilt();
         }
 
         // 애니메이터 파라미터 업데이트
@@ -47,6 +50,8 @@ public class BotController : MonoBehaviour
 
         // 점프 처리
         JumpCheck();
+
+
 
         if (!isDown)
         {
@@ -159,26 +164,41 @@ public class BotController : MonoBehaviour
         }
     }
 
-
-    // 다운 상태에서 2초 동안 걷기 상태로 유지
-    IEnumerator WalkWhileDownState()
+    void AdjustHeightBasedOnTilt()
     {
-        animator.SetBool("IsWalking", true);  // 걷기 애니메이션 활성화
+        // 오브젝트의 기울기를 구하기 위해 transform.up 벡터를 사용
+        Vector3 up = transform.up;  // 캐릭터의 위 방향
 
-        // Down 상태에서는 일정 속도(느리게)를 설정
-        velocity = new Vector3(0.5f, velocity.y, 0);  // 느리게 걷는 속도
+        // 월드 좌표계에서 기울기 각도 계산 (transform.up과 Vector3.up의 각도 차이)
+        float angle = Vector3.Angle(up, Vector3.up);  // XZ 평면에서 기울어진 각도 계산
 
-        // 2초 동안 걷기 상태 유지
-        yield return new WaitForSeconds(2f);
+        // 기울기(angle)를 바탕으로 height 값을 계산 (0에서 1.5 사이)
+        // 기울기가 0일 때는 minHeight, 90일 때는 maxHeight
+        float height = Mathf.Lerp(maxHeight, minHeight, Mathf.InverseLerp(0f, 90f, angle));
 
-        // 걷기 상태 종료
-        animator.SetBool("IsWalking", false);
+        if (isDown)
+        {
+            Vector3 newCenter = controller.center;
+            newCenter.y = 0.25f;
+            controller.center = newCenter;
+        }
+
+        // height 값을 캐릭터 컨트롤러에 적용
+        controller.height = height;
     }
 
-    IEnumerator RecoverFromDownState()
+    // 다운 상태 복구 Coroutine
+    private IEnumerator RecoverFromDownState()
     {
         // 2초 대기
         yield return new WaitForSeconds(2f);
+
+        // 복구 조건 체크
+        if (colCnt >= 4)
+        {
+            // colCnt가 4 이상일 경우 복구하지 않음
+            yield break;
+        }
 
         // 다운 상태 복구
         isDown = false;
@@ -187,84 +207,64 @@ public class BotController : MonoBehaviour
         // 복구 후 이동 가능하도록 velocity 초기화 (Y축은 유지)
         velocity = new Vector3(0, velocity.y, 0);  // Y축 속도는 유지하며 X, Z는 복구
 
-        // 이동 재개
-        // 이후 기존의 MoveBot() 함수가 계속 호출되도록 함
+        // 이동 재개 (이후 MoveBot() 함수가 계속 호출되도록 유지)
     }
+
+
+    // 충돌 후 처리를 공통 함수로 분리
+    private void HandleChocoCollision()
+    {
+        // 초코 충돌 카운트 증가 및 메터리얼 전환
+        ChocoColCntPlusCheck();
+
+        // 무조건 다운 상태로 전환
+        animator.SetBool("IsDown", true);
+        isDown = true;  // Down 상태 설정
+
+        // 점프 상태 해제
+        hasJumped = false;
+
+        // X, Y, Z 모두 0으로 설정하여 이동을 완전히 멈춤
+        velocity = Vector3.zero;
+
+        // 캐릭터 컨트롤러의 높이를 최소로 바꿈
+        controller.height = minHeight;
+
+        // colCnt가 4 이상이면 복구를 멈추고 복구 코루틴을 시작하지 않음
+        if (colCnt >= 4)
+        {
+            return; // 복구를 하지 않음
+        }
+
+        // colCnt가 3 이하일 경우 복구 시작
+        StartCoroutine(RecoverFromDownState());
+    }
+
+
+    // 충돌한 객체가 "Choco"인지 확인하고 처리
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        // 충돌한 객체의 Collider를 얻을 수 있음
-        Collider otherCollider = hit.collider;
-
-        // 특정 태그를 가진 객체와 충돌 시 처리
-        if (otherCollider.CompareTag("Choco"))
+        if (hit.collider.CompareTag("Choco"))
         {
-            //Debug.Log("Choco와 충돌!");
-
-            //메테리얼 한 부위 바꾸고 체크 
-            ChocoColCntPlusCheck();
-            if (colCnt < maxColCnt)
-            {
-                // 2초 동안 걷기 상태로 유지 멈춤
-                StopCoroutine(WalkWhileDownState());
-
-                // 2초 후 복구 멈춤
-                StopCoroutine(RecoverFromDownState());
-            }
-            // 애니메이터 상태를 "Down"으로 바꾸고
-            animator.SetBool("IsDown", true);
-            isDown = true;  // Down 상태 설정
-
-            // 점프 상태 해제
-            hasJumped = false;
-            // X, Y, Z 모두 0으로 설정하여 이동을 완전히 멈춤
-            velocity = Vector3.zero;
-            if (colCnt < maxColCnt)
-            {
-                // 2초 동안 걷기 상태로 유지
-                StartCoroutine(WalkWhileDownState());
-
-                // 2초 후 복구
-                StartCoroutine(RecoverFromDownState());
-            }
+            HandleChocoCollision();
         }
     }
 
+    // 파티클 충돌 시 처리
     void OnParticleCollision(GameObject other)
     {
-        // 파티클 시스템의 충돌 대상이 "Choco" 태그를 가진 오브젝트인 경우
         if (other.CompareTag("Choco"))
         {
-            //메테리얼 한 부위 바꾸고 체크 
-            ChocoColCntPlusCheck();
-            if (colCnt < maxColCnt)
-            {
-                // 2초 후 복구 멈춤
-                StopCoroutine(RecoverFromDownState());
-            }
-
-            // "Down" 상태로 변경
-            isDown = true;
-            animator.SetBool("IsDown", true);
-
-            // 이동 멈추기
-            velocity = Vector3.zero;
-
-            // 점프 상태 해제
-            hasJumped = false;
-            if (colCnt < maxColCnt)
-            {
-                // 2초 후 복구 (걷기 상태를 유지하며 복구)
-                StartCoroutine(RecoverFromDownState());
-            }
-
+            HandleChocoCollision();
         }
     }
 
+    // 초코 충돌 카운트 증가 및 메터리얼 전환 처리
     void ChocoColCntPlusCheck()
     {
         if (colCnt < maxColCnt)
         {
-            colCnt++;//초코충돌 발생할때마다 카운트 추가
+            colCnt++;  // 초코 충돌 발생할 때마다 카운트 추가
             M_SwitchControl.SwitchNextMaterial();
         }
     }

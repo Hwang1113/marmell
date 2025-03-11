@@ -75,6 +75,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9194519386286064100}
   - component: {fileID: 5521422256937151926}
+  - component: {fileID: 2131076908337376899}
   m_Layer: 0
   m_Name: body_arms
   m_TagString: Untagged
@@ -121,6 +122,7 @@ SkinnedMeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 9a8739c58c085524b9ec2b0172b9f2a4, type: 2}
+  - {fileID: 2100000, guid: 3e48866dd303b37428de699a49cfd67b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -181,6 +183,18 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.00018370152, y: 0.20051612, z: -0.021011114}
     m_Extent: {x: 0.74691117, y: 0.113780305, z: 0.091611005}
   m_DirtyAABB: 0
+--- !u!114 &2131076908337376899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1428325645966412768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9be1f0719e5c84e43a25304e3fc937a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1584900159413009669
 GameObject:
   m_ObjectHideFlags: 0
@@ -415,6 +429,7 @@ GameObject:
   - component: {fileID: 238331713658859046}
   - component: {fileID: 8675160483581108640}
   - component: {fileID: 5127606751206524017}
+  - component: {fileID: 479726303594252741}
   m_Layer: 0
   m_Name: MallowBot
   m_TagString: Untagged
@@ -435,10 +450,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 9194519386286064100}
-  - {fileID: 8299963231015577179}
   - {fileID: 3291202613149438210}
   - {fileID: 9065964236541975432}
+  - {fileID: 9194519386286064100}
+  - {fileID: 8299963231015577179}
   - {fileID: 4077643046026480460}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -451,7 +466,7 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3160428742121167352}
   m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 41f081d5c6d286c47a33bed3f84de79a, type: 3}
+  m_Avatar: {fileID: 9000000, guid: a4a1c75d706a049438222c8be324e0ee, type: 2}
   m_Controller: {fileID: 9100000, guid: 624342d990c739a49b35cbb959d0f511, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
@@ -509,6 +524,22 @@ MonoBehaviour:
   groundCheckDistance: 0.3
   isGrounded: 0
   hasJumped: 0
+  isDown: 0
+  M_SwitchControl: {fileID: 0}
+--- !u!114 &479726303594252741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3160428742121167352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c9ca7e6649a40b4e94385994a52a4b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  materialSwitchers: []
+  switchAll: 1
 --- !u!1 &3199310983453705187
 GameObject:
   m_ObjectHideFlags: 0
@@ -583,6 +614,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3291202613149438210}
   - component: {fileID: 4303031608295701518}
+  - component: {fileID: 6392699339980196621}
   m_Layer: 0
   m_Name: body_legs
   m_TagString: Untagged
@@ -629,6 +661,7 @@ SkinnedMeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 9a8739c58c085524b9ec2b0172b9f2a4, type: 2}
+  - {fileID: 2100000, guid: 3e48866dd303b37428de699a49cfd67b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -689,6 +722,18 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.00088584423, y: -0.28668702, z: 0.015242621}
     m_Extent: {x: 0.17382908, y: 0.22790802, z: 0.11229749}
   m_DirtyAABB: 0
+--- !u!114 &6392699339980196621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4385084751716865255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9be1f0719e5c84e43a25304e3fc937a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4683033188288689899
 GameObject:
   m_ObjectHideFlags: 0
@@ -731,6 +776,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8299963231015577179}
   - component: {fileID: 387900530562249355}
+  - component: {fileID: 8805858679895651570}
   m_Layer: 0
   m_Name: body_head
   m_TagString: Untagged
@@ -777,7 +823,7 @@ SkinnedMeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 9a8739c58c085524b9ec2b0172b9f2a4, type: 2}
-  - {fileID: 2100000, guid: 9a8739c58c085524b9ec2b0172b9f2a4, type: 2}
+  - {fileID: 2100000, guid: 3e48866dd303b37428de699a49cfd67b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -840,6 +886,18 @@ SkinnedMeshRenderer:
     m_Center: {x: 0, y: 0.6628249, z: -0.044824094}
     m_Extent: {x: 0.31384397, y: 0.3330397, z: 0.37821218}
   m_DirtyAABB: 0
+--- !u!114 &8805858679895651570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4896804532916437372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9be1f0719e5c84e43a25304e3fc937a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4973499609626457998
 GameObject:
   m_ObjectHideFlags: 0
@@ -1013,6 +1071,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9065964236541975432}
   - component: {fileID: 4951756317412546383}
+  - component: {fileID: 6629651046077587478}
   m_Layer: 0
   m_Name: body_torso
   m_TagString: Untagged
@@ -1059,6 +1118,7 @@ SkinnedMeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 9a8739c58c085524b9ec2b0172b9f2a4, type: 2}
+  - {fileID: 2100000, guid: 3e48866dd303b37428de699a49cfd67b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1119,6 +1179,18 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.000000014901161, y: 0.125723, z: 0.0026206821}
     m_Extent: {x: 0.24043, y: 0.2833993, z: 0.19290474}
   m_DirtyAABB: 0
+--- !u!114 &6629651046077587478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5602488847777928535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9be1f0719e5c84e43a25304e3fc937a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6032140868238449174
 GameObject:
   m_ObjectHideFlags: 0
