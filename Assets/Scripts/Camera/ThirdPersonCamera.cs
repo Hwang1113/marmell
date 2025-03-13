@@ -9,7 +9,7 @@ public class ThirdPersonCamera : MonoBehaviour
     public float heightDamping = 2f; // 높이 보정 속도
     public float rotationDamping = 3f; // 회전 보정 속도
 
-    public float minDistance = 2f; // 최소 거리
+    public float minDistance = 3f; // 최소 거리
     public float maxDistance = 10f; // 최대 거리
     public float zoomSpeed = 2f; // 마우스 휠로 조정할 때의 속도
 

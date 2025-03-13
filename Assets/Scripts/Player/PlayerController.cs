@@ -2,15 +2,14 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 5f; // 기본 이동 속도
-    public float sprintSpeed = 10f; // 달리기 속도
-    public Transform upperBody; // 상체 본 (예: Spine 또는 Chest)
+    public float moveSpeed = 10f; // 기본 이동 속도
     public float rotationSpeed = 5f; // 상체 회전 속도
 
     private CharacterController controller;
     private Animator animator;
     private Vector3 velocity; // 속도 벡터
     private Camera mainCamera; // 카메라
+
 
     void Start()
     {
@@ -25,8 +24,7 @@ public class PlayerController : MonoBehaviour
         // 이동 처리
         MovePlayer();
 
-        // 상체 회전 처리
-        HandleUpperBodyRotation();
+        ShootChoco();
 
         // 애니메이터 파라미터 업데이트
         UpdateAnimator();
@@ -58,8 +56,7 @@ public class PlayerController : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(moveDirection);
         }
 
-        // Shift 키를 누르면 빠르게 이동 (달리기)
-        float currentSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : moveSpeed;
+        float currentSpeed = moveSpeed;
 
         // 이동 방향에 속도 적용
         velocity = moveDirection * currentSpeed;
@@ -81,16 +78,49 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void HandleUpperBodyRotation()
+    void ShootChoco()
     {
-        // 클릭했을 때 상체 회전
         if (Input.GetMouseButtonDown(0)) // 마우스 왼쪽 버튼 클릭
         {
-            // 카메라 방향으로 회전
-            Vector3 directionToCamera = mainCamera.transform.forward;
-            directionToCamera.y = 0f; // 수평 회전만 적용
-            Quaternion targetRotation = Quaternion.LookRotation(directionToCamera);
-            upperBody.rotation = Quaternion.Slerp(upperBody.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            animator.SetBool("IsShooting", true);
+            bool randomValue = Random.value > 0.5f;  // 0.5보다 큰 값이면 true, 그렇지 않으면 false
+            animator.SetBool("IsLeft", randomValue);  // 무작위로 true 또는 false를 설정
+            Invoke("StopShooting", 1f);
         }
+    }
+    void StopShooting()
+    {
+        animator.SetBool("IsShooting", false);
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.collider.CompareTag("MallowBot"))
+        {
+            Animator hitAnimator = hit.collider.gameObject.GetComponent<Animator>();
+
+            if (hitAnimator != null)
+            {
+                bool isDown = hitAnimator.GetBool("IsDown");
+                Debug.Log($"MallowBot hit! IsDown: {isDown}");
+
+                if (!isDown)
+                {
+                    animator.SetBool("UnderAttack", true);
+                    bool randomValue = Random.value > 0.5f;
+                    animator.SetBool("IsLeft", randomValue);
+                    Invoke("StopDrop", 1f);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("MallowBot animator not found.");
+            }
+        }
+    }
+
+    void StopDrop()
+    {
+        animator.SetBool("UnderAttack", false);
     }
 }

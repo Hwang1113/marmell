@@ -7,15 +7,13 @@ public class ClickShot : MonoBehaviour
     {
         chocoParticleSystem = GetComponent<ParticleSystem>();
     }
-
         void Update()
     {
-        // ���콺 ���� ��ư Ŭ�� �� ��ƼŬ ����
-        if (Input.GetMouseButtonDown(0))  // 0�� ��Ŭ���� �ǹ�
+        if (Input.GetMouseButtonDown(0)) 
         {
             if (GetComponent<ParticleSystem>() != null)
             {
-                GetComponent<ParticleSystem>().Play();  // ��ƼŬ ����
+                GetComponent<ParticleSystem>().Play();
             }
         }
     }

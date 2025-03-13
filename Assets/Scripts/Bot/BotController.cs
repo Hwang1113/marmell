@@ -15,6 +15,7 @@ public class BotController : MonoBehaviour
     public MaterialSwitcherController M_SwitchControl;
     public float minHeight = 0f;  // 최소 height 값
     public float maxHeight = 1.5f;  // 최대 height 값
+    public float pitchTolerance = 15f; // 기울어짐 허용 범위 (15도)
 
     private CharacterController controller;
     private Animator animator;
@@ -24,6 +25,7 @@ public class BotController : MonoBehaviour
     private int jumpBoostpower = 2; // 점프했을때 곱하는 가속
     private int colCnt = 0; // 초코랑 충돌한 횟수 4번 충돌하면 초코멜로
     private int maxColCnt = 4;
+    private ObjectActivator objectActivator; // ObjectActivator 컴포넌트
 
     void Start()
     {
@@ -31,8 +33,14 @@ public class BotController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         M_SwitchControl = GetComponent<MaterialSwitcherController>();
+
         // 플레이어의 Transform을 찾기
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+
+        // ObjectActivator 컴포넌트 찾기
+        objectActivator = GetComponentInChildren<ObjectActivator>();
+        // ObjectActivator의 스케일링이 완료된 후 실행할 작업을 설정
+        objectActivator.onScaleComplete = OnScaleComplete;
     }
 
     void Update()
@@ -41,9 +49,10 @@ public class BotController : MonoBehaviour
         if (!isDown)
         {
             MoveBot();
-            //컨트롤러 높이 조정
-            AdjustHeightBasedOnTilt();
         }
+
+        // 컨트롤러 높이 조정
+        AdjustHeightBasedOnTilt();
 
         // 애니메이터 파라미터 업데이트
         UpdateAnimator();
@@ -51,12 +60,16 @@ public class BotController : MonoBehaviour
         // 점프 처리
         JumpCheck();
 
-
-
         if (!isDown)
         {
             // 실제 이동: CharacterController.Move()로 이동
             controller.Move(velocity * Time.deltaTime);
+        }
+
+        // colCnt가 4 이상일 경우 ObjectActivator 활성화
+        if (colCnt >= maxColCnt && objectActivator != null)
+        {
+            objectActivator.ActivateObject(); // 오브젝트 활성화
         }
     }
 
@@ -64,11 +77,12 @@ public class BotController : MonoBehaviour
     {
         if (playerTransform == null) return;
 
-        // 플레이어와의 거리 계산
-        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+        // 플레이어와의 거리 계산 (xz 평면만 사용)
+        float distanceToPlayerSquared = (new Vector3(transform.position.x, 0, transform.position.z) - new Vector3(playerTransform.position.x, 0, playerTransform.position.z)).sqrMagnitude;
+        float jumpDistanceSquared = jumpDistance * jumpDistance;
 
         // 플레이어가 일정 거리 이내에 있으면 점프
-        if (distanceToPlayer <= jumpDistance && isGrounded && !hasJumped)
+        if (distanceToPlayerSquared <= jumpDistanceSquared && isGrounded && !hasJumped && playerTransform.position.y >= transform.position.y)
         {
             Jump();
         }
@@ -76,10 +90,20 @@ public class BotController : MonoBehaviour
         // 플레이어를 향해 이동 (카메라와는 관계 없이, 플레이어의 방향으로만)
         Vector3 directionToPlayer = (playerTransform.position - transform.position).normalized;
 
-        // 이동 방향으로 회전
+        // 이동 방향으로 부드럽게 회전
         if (directionToPlayer.magnitude >= 0.1f)
         {
-            transform.rotation = Quaternion.LookRotation(directionToPlayer);
+            float rotationSpeed = 5f;
+            Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer);
+            Vector3 targetEulerAngles = targetRotation.eulerAngles;
+
+            targetEulerAngles.x = Mathf.Clamp(targetEulerAngles.x, -pitchTolerance, pitchTolerance);
+            targetRotation = Quaternion.Euler(targetEulerAngles);
+
+            if (Quaternion.Angle(transform.rotation, targetRotation) > 0.1f)
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            }
         }
 
         // 항상 달리기 (걷기 없이)
@@ -140,15 +164,25 @@ public class BotController : MonoBehaviour
     void UpdateAnimator()
     {
         // 이동 상태 업데이트: Speed 파라미터 값 설정
-        float speed = new Vector3(velocity.x, 0, velocity.z).magnitude;
-        animator.SetFloat("Speed", speed);
+        float speed = velocity.magnitude;
+        // Speed가 0인 경우 애니메이터에서 Speed를 0으로 설정
+        // isDown이 true일 경우 Speed는 0으로 설정하여 달리기 애니메이션이 나오지 않도록 처리
+        if (isDown)
+        {
+            animator.SetFloat("Speed", 0);
+        }
+        else
+        {
+            // Speed 값은 항상 갱신 (velocity 값에 따라 업데이트)
+            animator.SetFloat("Speed", speed);
+        }
 
         // 점프 상태 업데이트: Jump 파라미터로 점프 상태 확인
         if (isGrounded)
         {
             animator.SetBool("IsJumping", false);
         }
-        else if (!isGrounded)
+        else
         {
             animator.SetBool("IsJumping", true);
         }
@@ -166,25 +200,30 @@ public class BotController : MonoBehaviour
 
     void AdjustHeightBasedOnTilt()
     {
-        // 오브젝트의 기울기를 구하기 위해 transform.up 벡터를 사용
-        Vector3 up = transform.up;  // 캐릭터의 위 방향
+        if (!isDown)
+        {
+            // 오브젝트의 기울기를 구하기 위해 transform.up 벡터를 사용
+            Vector3 up = transform.up;  // 캐릭터의 위 방향
+                                        // 월드 좌표계에서 기울기 각도 계산 (transform.up과 Vector3.up의 각도 차이)
+            float angle = Vector3.Angle(up, Vector3.up);  // XZ 평면에서 기울어진 각도 계산
 
-        // 월드 좌표계에서 기울기 각도 계산 (transform.up과 Vector3.up의 각도 차이)
-        float angle = Vector3.Angle(up, Vector3.up);  // XZ 평면에서 기울어진 각도 계산
+            // 기울기(angle)를 바탕으로 height 값을 계산 (0에서 1.5 사이)
+            // 기울기가 0일 때는 minHeight, 90일 때는 maxHeight
+            float height = Mathf.Lerp(maxHeight, minHeight, Mathf.InverseLerp(0f, 90f, angle));
 
-        // 기울기(angle)를 바탕으로 height 값을 계산 (0에서 1.5 사이)
-        // 기울기가 0일 때는 minHeight, 90일 때는 maxHeight
-        float height = Mathf.Lerp(maxHeight, minHeight, Mathf.InverseLerp(0f, 90f, angle));
+            Vector3 newCenter = controller.center;
+            newCenter.y = 0.75f;
+            controller.center = newCenter;
 
+            // height 값을 캐릭터 컨트롤러에 적용
+            controller.height = height;
+        }
         if (isDown)
         {
             Vector3 newCenter = controller.center;
             newCenter.y = 0.25f;
             controller.center = newCenter;
         }
-
-        // height 값을 캐릭터 컨트롤러에 적용
-        controller.height = height;
     }
 
     // 다운 상태 복구 Coroutine
@@ -268,4 +307,26 @@ public class BotController : MonoBehaviour
             M_SwitchControl.SwitchNextMaterial();
         }
     }
+
+    // 스케일링이 끝난 후 호출될 콜백 메서드
+    private void OnScaleComplete()
+    {
+        Debug.Log("Scaling completed! Now doing something else.");
+        DisableAnimatorAndSkinnedMeshRenderers();
+    }
+
+    // 애니메이터와 자식 SkinnedMeshRenderer들을 비활성화하는 함수
+    private void DisableAnimatorAndSkinnedMeshRenderers()
+    {
+        // 애니메이터 비활성화
+        animator.enabled = false;
+
+        // 모든 자식 SkinnedMeshRenderer 비활성화
+        SkinnedMeshRenderer[] skinnedMeshes = GetComponentsInChildren<SkinnedMeshRenderer>();
+        foreach (var skinnedMesh in skinnedMeshes)
+        {
+            skinnedMesh.enabled = false; // 스킨 렌더러 비활성화
+        }
+    }
+
 }
