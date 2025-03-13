@@ -109,7 +109,7 @@ public class PlayerController : MonoBehaviour
                     animator.SetBool("UnderAttack", true);
                     bool randomValue = Random.value > 0.5f;
                     animator.SetBool("IsLeft", randomValue);
-                    Invoke("StopDrop", 1f);
+                    Invoke("StopDrop", 1.5f);
                 }
             }
             else

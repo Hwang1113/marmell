@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class BotController : MonoBehaviour
 {
@@ -9,13 +10,15 @@ public class BotController : MonoBehaviour
     public float followDistance = 2.5f; // 플레이어와의 추적 거리
     public float jumpDistance = 4f; // 점프 거리 (플레이어가 가까워졌을 때 점프)
     public float groundCheckDistance = 0.3f; // 바닥 체크 거리
+    public float minHeight = 0f;  // 최소 height 값
+    public float maxHeight = 1.5f;  // 최대 height 값
+    public float pitchTolerance = 15f; // 기울어짐 허용 범위 (15도)    
+    public float scaleDuration = 2f;    // 코루틴에서 사용할 시간 (스케일이 완전히 0이 될 때까지의 시간)
     public bool isGrounded; // 땅에 있는지 확인
     public bool hasJumped = false; // 점프가 시작되었는지 확인하는 변수
     public bool isDown = false; // "Down" 상태 확인 변수
     public MaterialSwitcherController M_SwitchControl;
-    public float minHeight = 0f;  // 최소 height 값
-    public float maxHeight = 1.5f;  // 최대 height 값
-    public float pitchTolerance = 15f; // 기울어짐 허용 범위 (15도)
+    public Action onDummyComplete;    // 외부에서 설정할 수 있는 콜백 액션
 
     private CharacterController controller;
     private Animator animator;
@@ -26,6 +29,8 @@ public class BotController : MonoBehaviour
     private int colCnt = 0; // 초코랑 충돌한 횟수 4번 충돌하면 초코멜로
     private int maxColCnt = 4;
     private ObjectActivator objectActivator; // ObjectActivator 컴포넌트
+
+
 
     void Start()
     {
@@ -39,8 +44,11 @@ public class BotController : MonoBehaviour
 
         // ObjectActivator 컴포넌트 찾기
         objectActivator = GetComponentInChildren<ObjectActivator>();
+        // ObjectActivator의 스케일링 시작 후 실행할 작업을 설정
+        objectActivator.onScaleStart = OnScaleStart;
         // ObjectActivator의 스케일링이 완료된 후 실행할 작업을 설정
         objectActivator.onScaleComplete = OnScaleComplete;
+
     }
 
     void Update()
@@ -307,26 +315,57 @@ public class BotController : MonoBehaviour
             M_SwitchControl.SwitchNextMaterial();
         }
     }
+    // 스케일링 시작 후 호출될 콜백 메서드
+    private void OnScaleStart()
+    {
+        Debug.Log("초코볼화 시작");
+        // 절반 스케일 코루틴 실행
+        StartCoroutine(ScaleToHalf());
+        // 캐릭터 컨트롤러 비활성화
+        controller.enabled = false;
+    }
+    private IEnumerator ScaleToHalf()
+    {
+        Vector3 initialScale = transform.localScale; // 초기 스케일 저장
+        Vector3 targetScale = Vector3.one / 2f;     // 목표 스케일 (Vector3.one / 2)
+
+        float elapsedTime = 0f; // 경과 시간
+
+        while (elapsedTime < scaleDuration)
+        {
+            // 경과 시간에 비례하여 스케일 계산
+            transform.localScale = Vector3.Lerp(initialScale, targetScale, elapsedTime / scaleDuration);
+
+            elapsedTime += Time.deltaTime; // 시간 증가
+            yield return null; // 한 프레임 대기
+        }
+
+        // 마지막에는 정확히 목표 스케일로 설정
+        transform.localScale = targetScale;
+    }
 
     // 스케일링이 끝난 후 호출될 콜백 메서드
     private void OnScaleComplete()
     {
-        Debug.Log("Scaling completed! Now doing something else.");
+        Debug.Log("초코볼화 완료 후 최적화 시작");
         DisableAnimatorAndSkinnedMeshRenderers();
+        onDummyComplete?.Invoke(); //더미화 완료 콜백
+
     }
 
     // 애니메이터와 자식 SkinnedMeshRenderer들을 비활성화하는 함수
+    // 애니메이터 비활성화와 스킨 렌더러, 스케일 줄이기 (코루틴 사용)
     private void DisableAnimatorAndSkinnedMeshRenderers()
     {
         // 애니메이터 비활성화
         animator.enabled = false;
 
-        // 모든 자식 SkinnedMeshRenderer 비활성화
+        // 스킨 렌더러들 가져옴
         SkinnedMeshRenderer[] skinnedMeshes = GetComponentsInChildren<SkinnedMeshRenderer>();
         foreach (var skinnedMesh in skinnedMeshes)
         {
-            skinnedMesh.enabled = false; // 스킨 렌더러 비활성화
+            // 스킨 렌더러 비활성화
+            skinnedMesh.enabled = false;
         }
     }
-
 }

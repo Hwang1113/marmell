@@ -6,6 +6,7 @@ public class ObjectActivator : MonoBehaviour
 {
     private MeshRenderer meshRenderer;
     private Collider objectCollider;
+    private Rigidbody dummyRigidbody;
     private Vector3 initialScale;
 
     private bool isActive = false;
@@ -13,6 +14,7 @@ public class ObjectActivator : MonoBehaviour
 
     // 외부에서 설정할 수 있는 콜백 액션
     public Action onScaleComplete;
+    public Action onScaleStart;
 
     void Start()
     {
@@ -24,6 +26,7 @@ public class ObjectActivator : MonoBehaviour
     {
         meshRenderer = GetComponent<MeshRenderer>();
         objectCollider = GetComponent<Collider>();
+        dummyRigidbody = GetComponent<Rigidbody>();
         initialScale = transform.localScale;
     }
 
@@ -31,6 +34,7 @@ public class ObjectActivator : MonoBehaviour
     {
         meshRenderer.enabled = false;
         objectCollider.enabled = false;
+        dummyRigidbody.isKinematic = true;
         transform.localScale = Vector3.zero;
     }
 
@@ -59,6 +63,7 @@ public class ObjectActivator : MonoBehaviour
         float elapsedTime = 0f;
         transform.localScale = fromScale;
 
+        onScaleStart?.Invoke();
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
@@ -71,6 +76,7 @@ public class ObjectActivator : MonoBehaviour
 
         // 스케일링 완료 후 외부에서 설정한 콜백 실행
         onScaleComplete?.Invoke();
+        dummyRigidbody.isKinematic = false;
     }
 
     private void SetActiveState(bool isActiveState)
