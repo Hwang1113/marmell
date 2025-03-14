@@ -95,29 +95,32 @@ public class PlayerController : MonoBehaviour
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        if (hit.collider.CompareTag("MallowBot"))
+        // 충돌한 객체가 "CharacterController"인 경우만 처리
+        if (hit.collider.GetComponent<CharacterController>() != null)
         {
-            Animator hitAnimator = hit.collider.gameObject.GetComponent<Animator>();
+            Debug.Log("충돌한 객체는 CharacterController입니다.");
 
-            if (hitAnimator != null)
+            // 여기서 충돌 처리 로직을 추가합니다.
+            if (hit.collider.CompareTag("MallowBot"))
             {
-                bool isDown = hitAnimator.GetBool("IsDown");
-                Debug.Log($"MallowBot hit! IsDown: {isDown}");
-
-                if (!isDown)
+                if (animator != null)
                 {
                     animator.SetBool("UnderAttack", true);
+
                     bool randomValue = Random.value > 0.5f;
                     animator.SetBool("IsLeft", randomValue);
-                    Invoke("StopDrop", 1.5f);
+
+                    // 1초 후 StopDrop 호출
+                    Invoke("StopDrop", 1f);
                 }
-            }
-            else
-            {
-                Debug.LogWarning("MallowBot animator not found.");
+                else
+                {
+                    Debug.LogWarning("MallowBot animator not found.");
+                }
             }
         }
     }
+
 
     void StopDrop()
     {
