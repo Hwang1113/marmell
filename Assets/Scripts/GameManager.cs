@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour
     void HandleDynamicBotControllers()
     {
         // 현재 존재하는 BotController들 가져오기
-        BotController[] currentBotControllers = FindObjectsOfType<BotController>();
+        BotController[] currentBotControllers = FindObjectsByType<BotController>(FindObjectsSortMode.None);
 
         // 새로운 BotController가 추가된 경우 처리
         foreach (var botController in currentBotControllers)
