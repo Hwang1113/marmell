@@ -8,6 +8,7 @@ public class SpaceBarrier : MonoBehaviour
     private Collider sCollider = null;
     public Transform childtransform = null;
     public ParticleSystem chocoParticleSystem;
+    public float maxSize = 4f;
 
 
     // Start is called once before the first frame update
@@ -34,14 +35,14 @@ public class SpaceBarrier : MonoBehaviour
 
         if (isScaling)
         {
-            // scale을 0에서 2로 점진적으로 증가
+            // scale을 0에서 maxSize로 점진적으로 증가
             elapsedTime += Time.deltaTime;
-            float scaleValue = Mathf.Lerp(0f, 2f, Mathf.Sqrt(elapsedTime / scaleDuration));
+            float scaleValue = Mathf.Lerp(0f, maxSize, Mathf.Sqrt(elapsedTime / scaleDuration));
 
-            // 2에 도달하면 바로 0으로 돌아가도록 처리
-            if (scaleValue >= 2f)
+            // maxSize에 도달하면 바로 0으로 돌아가도록 처리
+            if (scaleValue >= maxSize)
             {
-                scaleValue = 2f; // scale이 2에 도달하면 멈추고,
+                scaleValue = maxSize; // scale이 maxSize에 도달하면 멈추고,
                 childtransform.localScale = Vector3.zero; // 바로 0으로 리셋
                 isScaling = false; // 스케일링을 멈추고
                 sCollider.enabled = false;

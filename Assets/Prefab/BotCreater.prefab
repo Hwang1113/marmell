@@ -16,7 +16,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4796934669635739727
 Transform:
   m_ObjectHideFlags: 0
@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   botPrefab: {fileID: 3160428742121167352, guid: c5b0c65a6349bbb4898ec2c47fbc943b, type: 3}
-  botNum: 10
+  botNum: 100
   Location: {x: 0, y: 0, z: 0}
   minDistance: 1
-  spawnAreaSize: 5
+  spawnAreaSize: 40

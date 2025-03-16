@@ -281,18 +281,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: BotCreater
       objectReference: {fileID: 0}
-    - target: {fileID: 7612633533591454811, guid: bfd63bd1ca52359439c1db6d722842fa, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8577726402504963793, guid: bfd63bd1ca52359439c1db6d722842fa, type: 3}
-      propertyPath: botNum
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 8577726402504963793, guid: bfd63bd1ca52359439c1db6d722842fa, type: 3}
-      propertyPath: spawnAreaSize
-      value: 40
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -597,29 +585,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 741336024394155429, guid: 412117cefa7cf104a85b925da29b6371, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1788497816213100092, guid: 412117cefa7cf104a85b925da29b6371, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1916239993974777907, guid: 412117cefa7cf104a85b925da29b6371, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2285498943026754117, guid: 412117cefa7cf104a85b925da29b6371, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5510247904007497105, guid: 412117cefa7cf104a85b925da29b6371, type: 3}
       propertyPath: m_Name
       value: ChocolatePlayer
-      objectReference: {fileID: 0}
-    - target: {fileID: 6857863735056131748, guid: 412117cefa7cf104a85b925da29b6371, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8295569261943647543, guid: 412117cefa7cf104a85b925da29b6371, type: 3}
       propertyPath: m_LocalPosition.x
@@ -661,10 +629,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8859049510887431575, guid: 412117cefa7cf104a85b925da29b6371, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -681,10 +645,6 @@ PrefabInstance:
     - target: {fileID: 3160428742121167352, guid: c5b0c65a6349bbb4898ec2c47fbc943b, type: 3}
       propertyPath: m_Name
       value: MallowBot
-      objectReference: {fileID: 0}
-    - target: {fileID: 3160428742121167352, guid: c5b0c65a6349bbb4898ec2c47fbc943b, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6461896109002337479, guid: c5b0c65a6349bbb4898ec2c47fbc943b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -740,6 +700,14 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4847205636765081569, guid: 6d53307d01a60d84281e67b1db58819a, type: 3}
+      propertyPath: m_margin.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847205636765081569, guid: 6d53307d01a60d84281e67b1db58819a, type: 3}
+      propertyPath: m_margin.y
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847205636765081569, guid: 6d53307d01a60d84281e67b1db58819a, type: 3}
       propertyPath: m_fontStyle
       value: 0
       objectReference: {fileID: 0}
@@ -762,6 +730,10 @@ PrefabInstance:
     - target: {fileID: 4847205636765081569, guid: 6d53307d01a60d84281e67b1db58819a, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4278190080
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847205636765081569, guid: 6d53307d01a60d84281e67b1db58819a, type: 3}
+      propertyPath: m_paragraphSpacing
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5690155187037556246, guid: 6d53307d01a60d84281e67b1db58819a, type: 3}
       propertyPath: m_Name

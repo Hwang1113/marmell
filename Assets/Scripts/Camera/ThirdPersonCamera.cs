@@ -69,27 +69,30 @@ public class ThirdPersonCamera : MonoBehaviour
         Vector3 newCameraPosition = player.position + offset;
 
         // 카메라 기준으로 아래로 레이 쏘기
-        RaycastHit hit;
-        Ray ray = new Ray(new Vector3(newCameraPosition.x, player.position.y + 10f, newCameraPosition.z), Vector3.down); // 플레이어 위치 기준 위에서 아래로 레이 쏘기
+        RaycastHit[] hits;
+        Ray ray = new Ray(new Vector3(newCameraPosition.x, player.position.y + 20f, newCameraPosition.z), Vector3.down); // 플레이어 위치 기준 위에서 아래로 레이 쏘기
 
-        if (Physics.Raycast(ray, out hit, distance + 10f)) // 거리 + 10f로 수정하여, 더 넓은 범위에서 충돌 확인
+        hits = Physics.RaycastAll(ray, distance + 20f); // 거리 충돌 확인 (모든 충돌 지점 확인)
+
+        // 충돌한 물체들 중에서 'Ground' 태그만 처리
+        foreach (RaycastHit hit in hits)
         {
-            // 충돌한 객체가 'Ground' 태그를 가지고 있으면
             if (hit.collider.CompareTag(collisionTag))
             {
                 // 카메라의 y 위치가 충돌 지점보다 낮아지지 않게 제한
-                newCameraPosition.y = Mathf.Max(newCameraPosition.y, hit.point.y + 0.5f); // 0.5f로 오프셋을 조금 더 올리기
+                newCameraPosition.y = Mathf.Max(newCameraPosition.y, hit.point.y + 1f); // 0.5f로 오프셋을 조금 더 올리기
+                break; // 'Ground' 태그를 찾으면 그 위치로 이동하고 나머지는 무시
             }
-            else
-            {
-                // 'Ground'가 아닌 다른 객체와 충돌하면 카메라는 그 위치로 이동
-                newCameraPosition.y = hit.point.y; 
-            }
-
-            // 디버그용 레이캐스트 선을 그리기 (카메라 기준 아래로)
-            Debug.DrawRay(ray.origin, Vector3.down * (distance + 1f), Color.red); // 레이캐스트 선 (카메라 위치에서 아래로)
-            Debug.DrawRay(ray.origin, hit.normal * 2f, Color.blue); // 법선 벡터 (충돌한 표면의 법선 방향)
         }
+
+        // 만약 원하는 태그와 충돌하지 않았다면, 기본적으로 계산된 카메라 위치를 사용
+        if (newCameraPosition.y == player.position.y + offset.y)
+        {
+            newCameraPosition.y = Mathf.Max(newCameraPosition.y, player.position.y + offset.y);
+        }
+
+        // 디버그용 레이캐스트 선을 그리기 (카메라 기준 아래로)
+        Debug.DrawRay(ray.origin, Vector3.down * (distance + 1f), Color.red); // 레이캐스트 선 (카메라 위치에서 아래로)
 
         // 카메라를 플레이어를 따라 다니도록 부드럽게 이동
         transform.position = Vector3.SmoothDamp(transform.position, newCameraPosition, ref velocity, rotationDamping * Time.deltaTime);
