@@ -17,9 +17,6 @@ public class GameManager : MonoBehaviour
         {
             scoreTxt.UpdateScore(score);
         }
-
-        // 점수 증가 코루틴 시작
-        StartCoroutine(ScoreBoostCoroutine());
     }
 
     void Update()
@@ -88,15 +85,5 @@ public class GameManager : MonoBehaviour
     {
         score += amount;  // 점수 증가 또는 감소
         scoreTxt.UpdateScore(score); // 점수 텍스트를 갱신
-    }
-
-    // 10초마다 점수를 10점 증가시키는 코루틴
-    private IEnumerator ScoreBoostCoroutine()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(10f); // 10초 대기
-            ChangeScore(10); // 10초마다 10점 증가
-        }
     }
 }
