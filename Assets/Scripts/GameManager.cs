@@ -5,6 +5,7 @@ using System.Linq;
 public class GameManager : MonoBehaviour
 {
     public ScoreTxt scoreTxt; // 점수를 표시할 텍스트
+    public ComboTxt comboTxt; // 콤보를 표시할 텍스트
     public BotController[] botControllers; // BotController 배열
     private int score = 0; // 점수 변수
 
@@ -17,6 +18,9 @@ public class GameManager : MonoBehaviour
         {
             scoreTxt.UpdateScore(score);
         }
+        // 점수 초기화
+        comboTxt = GetComponentInChildren<ComboTxt>();
+
     }
 
     void Update()
@@ -61,6 +65,7 @@ public class GameManager : MonoBehaviour
         if (botController != null)
         {
             botController.onDummyComplete += OnDummyComplete;
+            botController.onCombo += OnCombo;
         }
     }
 
@@ -70,6 +75,7 @@ public class GameManager : MonoBehaviour
         if (botController != null)
         {
             botController.onDummyComplete -= OnDummyComplete;
+            botController.onCombo -= OnCombo;
         }
     }
 
@@ -80,10 +86,20 @@ public class GameManager : MonoBehaviour
         ChangeScore(10); // 예시로 10점 증가
     }
 
+    private void OnCombo()
+    {
+        Combo(); // 콤보 1 증가
+    }
+
     // 점수를 변경하는 메서드
     public void ChangeScore(int amount)
     {
         score += amount;  // 점수 증가 또는 감소
         scoreTxt.UpdateScore(score); // 점수 텍스트를 갱신
+    }
+
+    public void Combo()
+    {
+        comboTxt.UpdateCombo();
     }
 }

@@ -6,9 +6,10 @@ public class BotController : MonoBehaviour
 {
     public float moveSpeed = 5f; // 기본 이동 속도
     public float sprintSpeed = 6f; // 달리기 속도
-    public float jumpHeight = 5f; // 점프 높이
+    public float jumpHeight = 10f; // 점프 높이
+    public float lowJumpHeight = 5f; // 점프 높이
     public float followDistance = 2.5f; // 플레이어와의 추적 거리
-    public float jumpDistance = 4f; // 점프 거리 (플레이어가 가까워졌을 때 점프)
+    public float jumpDistance = 10f; // 점프 거리 (플레이어가 가까워졌을 때 점프)
     public float groundCheckDistance = 0.3f; // 바닥 체크 거리
     public float minHeight = 0f;  // 최소 height 값
     public float maxHeight = 1.5f;  // 최대 height 값
@@ -19,15 +20,17 @@ public class BotController : MonoBehaviour
     public bool isDown = false; // "Down" 상태 확인 변수
     public MaterialSwitcherController M_SwitchControl;
     public Action onDummyComplete;    // 외부에서 설정할 수 있는 콜백 액션
+    public Action onCombo;    // 외부에서 설정할 수 있는 콜백 액션
+    public Vector3 velocity; // 속도 벡터
 
     private CharacterController controller;
     private Animator animator;
-    private Vector3 velocity; // 속도 벡터
     private Transform playerTransform; // 플레이어의 Transform
     private Vector3 jumpDirection; // 점프 시작 시의 이동 방향을 저장하는 변수
     private int jumpBoostpower = 2; // 점프했을때 곱하는 가속
     private int colCnt = 0; // 초코랑 충돌한 횟수 4번 충돌하면 초코멜로
     private int maxColCnt = 4;
+    private float jumpTime = 0f;
     private ObjectActivator objectActivator; // ObjectActivator 컴포넌트
 
 
@@ -145,7 +148,9 @@ public class BotController : MonoBehaviour
         // 점프 동작: jumpHeight를 이용해 점프 속도 계산 
         if (isGrounded)
         {
-            velocity.y = jumpHeight;  // 점프 속도 설정
+            float random = UnityEngine.Random.Range(lowJumpHeight, jumpHeight);
+
+            velocity.y = random;
             jumpDirection = (playerTransform.position - transform.position).normalized;  // 점프 시 이동 방향 저장
             animator.SetTrigger("Jump");  // 점프 애니메이션 트리거
 
@@ -157,15 +162,19 @@ public class BotController : MonoBehaviour
     {
         // CharacterController의 isGrounded를 사용하여 바닥에 닿았는지 확인
         isGrounded = controller.isGrounded;
-
+        if (hasJumped)
+        {
+            jumpTime += Time.deltaTime;
+        }
         // 바닥에 닿으면 Y 속도를 초기화하고 점프 상태 종료
-        if (isGrounded && velocity.y < 2) // velocity.y <= 0 이었으나 버그 생겨서 바꿈
+        if (isGrounded && jumpTime > 0.5f)
         {
             velocity.y = -2f;  // 바닥에 닿으면 아래로 밀어넣음
             hasJumped = false;  // 점프 완료
 
             // 점프 후 원래 플레이어 방향으로 이동하도록 `jumpDirection` 리셋
             jumpDirection = Vector3.zero;
+            jumpTime = 0;
         }
     }
 
@@ -186,13 +195,13 @@ public class BotController : MonoBehaviour
         }
 
         // 점프 상태 업데이트: Jump 파라미터로 점프 상태 확인
-        if (isGrounded)
+        if (hasJumped)
         {
-            animator.SetBool("IsJumping", false);
+            animator.SetBool("IsJumping", true);
         }
         else
         {
-            animator.SetBool("IsJumping", true);
+            animator.SetBool("IsJumping", false);
         }
 
         // "Down" 상태 체크
@@ -282,7 +291,7 @@ public class BotController : MonoBehaviour
         {
             return; // 복구를 하지 않음
         }
-
+        onCombo?.Invoke(); //콤보 콜백
         // colCnt가 3 이하일 경우 복구 시작
         StartCoroutine(RecoverFromDownState());
     }
@@ -322,7 +331,7 @@ public class BotController : MonoBehaviour
         // 절반 스케일 코루틴 실행
         StartCoroutine(ScaleToHalf());
         // 캐릭터 컨트롤러 비활성화
-        controller.enabled = false;
+
     }
     private IEnumerator ScaleToHalf()
     {
@@ -350,6 +359,7 @@ public class BotController : MonoBehaviour
         Debug.Log("초코볼화 완료 후 최적화 시작");
         DisableAnimatorAndSkinnedMeshRenderers();
         onDummyComplete?.Invoke(); //더미화 완료 콜백
+        controller.enabled = false;
 
     }
 

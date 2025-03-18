@@ -5044,7 +5044,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3e48866dd303b37428de699a49cfd67b, type: 2}
+  - {fileID: 2100000, guid: 60353a493df80df4d94a1ab1161e7773, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5655,7 +5655,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2285498943026754117}
   serializedVersion: 8
-  lengthInSec: 0.6
+  lengthInSec: 0.05
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 0
@@ -5730,7 +5730,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 1
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -5901,7 +5901,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 3
+      scalar: 0.5
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -6284,7 +6284,7 @@ ParticleSystem:
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
     donutRadius: 0.2
-    m_Position: {x: 0, y: 1, z: 0}
+    m_Position: {x: 0, y: 0, z: 0}
     m_Rotation: {x: 0, y: 0, z: 0}
     m_Scale: {x: 1, y: 1, z: 1}
     placementMode: 0
@@ -6365,7 +6365,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 0.0001
+      value: 0.1
       mode: 0
       spread: 0
       speed:
@@ -6484,7 +6484,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 10
+      scalar: 1
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -6594,7 +6594,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 20
+        scalar: 10
         minScalar: 30
         maxCurve:
           serializedVersion: 2
@@ -6660,15 +6660,15 @@ ParticleSystem:
         - serializedVersion: 3
           time: 0
           value: 0
-          inSlope: 0.16426075
-          outSlope: 0.16426075
+          inSlope: 127.750244
+          outSlope: 127.750244
           tangentMode: 34
           weightedMode: 0
           inWeight: 0
           outWeight: 0.33333334
         - serializedVersion: 3
-          time: 0.166668
-          value: 0.02737701
+          time: 0.007827774
+          value: 1
           inSlope: 0.0000018776295
           outSlope: 0.0000018776295
           tangentMode: 0
@@ -6676,13 +6676,13 @@ ParticleSystem:
           inWeight: 0.33333334
           outWeight: 0.8135527
         - serializedVersion: 3
-          time: 0.5238093
+          time: 0.13146973
           value: 0
-          inSlope: -0.076655954
-          outSlope: -0.076655954
-          tangentMode: 34
+          inSlope: -0.016298039
+          outSlope: -0.016298039
+          tangentMode: 0
           weightedMode: 0
-          inWeight: 0.33333334
+          inWeight: 0.5748369
           outWeight: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
@@ -9300,9 +9300,9 @@ ParticleSystem:
         m_NumAlphaKeys: 2
     range: {x: 0, y: 1}
   CollisionModule:
-    enabled: 0
+    enabled: 1
     serializedVersion: 4
-    type: 0
+    type: 1
     collisionMode: 0
     colliderForce: 0
     multiplyColliderForceByParticleSize: 0
@@ -9469,7 +9469,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     minKillSpeed: 0
-    maxKillSpeed: 10000
+    maxKillSpeed: 10
     radiusScale: 1
     collidesWith:
       serializedVersion: 2
@@ -9477,7 +9477,7 @@ ParticleSystem:
     maxCollisionShapes: 256
     quality: 0
     voxelSize: 0.5
-    collisionMessages: 0
+    collisionMessages: 1
     collidesWithDynamic: 1
     interiorCollisions: 0
   TriggerModule:
@@ -10528,7 +10528,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   childtransform: {fileID: 0}
   chocoParticleSystem: {fileID: 0}
-  maxSize: 10
+  maxSize: 2
 --- !u!1 &2793865087090960259
 GameObject:
   m_ObjectHideFlags: 0

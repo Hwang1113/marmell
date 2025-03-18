@@ -616,7 +616,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6461896109002337479
 Transform:
   m_ObjectHideFlags: 0
@@ -699,9 +699,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   sprintSpeed: 6
-  jumpHeight: 4
+  jumpHeight: 10
+  lowJumpHeight: 5
   followDistance: 2.5
-  jumpDistance: 4
+  jumpDistance: 10
   groundCheckDistance: 0.3
   minHeight: 0
   maxHeight: 1.5
@@ -711,6 +712,7 @@ MonoBehaviour:
   hasJumped: 0
   isDown: 0
   M_SwitchControl: {fileID: 0}
+  velocity: {x: 0, y: 0, z: 0}
 --- !u!114 &479726303594252741
 MonoBehaviour:
   m_ObjectHideFlags: 0

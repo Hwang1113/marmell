@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.Rendering;
 
 public class PlayerController : MonoBehaviour
 {
@@ -22,7 +24,19 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         // 이동 처리
-        MovePlayer();
+        if (!animator.GetBool("UnderAttack"))
+        {
+            MovePlayer();
+        }
+        if (animator.GetBool("UnderAttack"))
+        {
+            // CharacterController로 이동
+            if (controller.isGrounded)
+            {
+                controller.Move(velocity * Time.deltaTime * 10f);
+            }
+            transform.rotation = Quaternion.LookRotation(new Vector3(velocity.x * -1f, 0f ,velocity.z * -1f));
+        }
 
         ShootChoco();
 
@@ -98,13 +112,21 @@ public class PlayerController : MonoBehaviour
         // 충돌한 객체가 "CharacterController"인 경우만 처리
         if (hit.collider.GetComponent<CharacterController>() != null)
         {
-            Debug.Log("충돌한 객체는 CharacterController입니다.");
-
-            // 여기서 충돌 처리 로직을 추가합니다.
+            // "MallowBot"과의 충돌 처리
             if (hit.collider.CompareTag("MallowBot"))
             {
-                if (animator != null)
+                BotController CheckedDummy = hit.transform.GetComponent<BotController>();
+                if (CheckedDummy.isDown || animator.GetBool("UnderAttack") == true) return; // 다운 상태거나 공격받은 상태면 처리 안함
+
+                Debug.Log("충돌 태그 : MallowBot");
+
+                if (animator)
                 {
+                    // MallowBot의 방향으로 이동하는 로직
+                    Vector3 direction = (transform.position - hit.transform.position).normalized;
+
+                    velocity = direction;
+
                     animator.SetBool("UnderAttack", true);
 
                     bool randomValue = Random.value > 0.5f;
@@ -120,7 +142,6 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
 
     void StopDrop()
     {
