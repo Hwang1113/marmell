@@ -10,7 +10,7 @@ public class ScoreTxt : MonoBehaviour
     {
         // TextMeshProUGUI 컴포넌트를 가져와서 scoreText에 할당
         scoreText = GetComponent<TextMeshProUGUI>();
-        if (scoreText == null)
+        if (!scoreText)
         {
             Debug.LogError("TextMeshProUGUI component not found on this object!");
         }
@@ -20,16 +20,16 @@ public class ScoreTxt : MonoBehaviour
     }
 
     // 점수를 갱신하고 텍스트를 업데이트하는 메서드
-    public void UpdateScore(int newScore)
+    public void UpdateScore(int _newScore)
     {
-        score = newScore;
+        score = _newScore;
         UpdateScoreText();
     }
 
     // TextMeshProUGUI에 점수를 갱신하는 메서드
     private void UpdateScoreText()
     {
-        if (scoreText != null)
+        if (!scoreText)
         {
             scoreText.text = "Score: " + score.ToString(); // 점수를 텍스트로 갱신
         }

@@ -702,7 +702,7 @@ MonoBehaviour:
   jumpHeight: 10
   lowJumpHeight: 5
   followDistance: 2.5
-  jumpDistance: 10
+  jumpDistance: 7.5
   groundCheckDistance: 0.3
   minHeight: 0
   maxHeight: 1.5

@@ -9,7 +9,7 @@ public class BotController : MonoBehaviour
     public float jumpHeight = 10f; // 점프 높이
     public float lowJumpHeight = 5f; // 점프 높이
     public float followDistance = 2.5f; // 플레이어와의 추적 거리
-    public float jumpDistance = 10f; // 점프 거리 (플레이어가 가까워졌을 때 점프)
+    public float jumpDistance = 7.5f; // 점프 거리 (플레이어가 가까워졌을 때 점프)
     public float groundCheckDistance = 0.3f; // 바닥 체크 거리
     public float minHeight = 0f;  // 최소 height 값
     public float maxHeight = 1.5f;  // 최대 height 값
@@ -92,8 +92,8 @@ public class BotController : MonoBehaviour
         float distanceToPlayerSquared = (new Vector3(transform.position.x, 0, transform.position.z) - new Vector3(playerTransform.position.x, 0, playerTransform.position.z)).sqrMagnitude;
         float jumpDistanceSquared = jumpDistance * jumpDistance;
 
-        // 플레이어가 일정 거리 이내에 있으면 점프
-        if (distanceToPlayerSquared <= jumpDistanceSquared && isGrounded && !hasJumped && playerTransform.position.y >= transform.position.y)
+        // 플레이어가 일정 거리 이내에 땅에 점프하지 않아 있으면 점프
+        if (distanceToPlayerSquared <= jumpDistanceSquared && isGrounded && !hasJumped)
         {
             Jump();
         }

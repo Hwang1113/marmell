@@ -6,7 +6,10 @@ public class GameManager : MonoBehaviour
 {
     public ScoreTxt scoreTxt; // 점수를 표시할 텍스트
     public ComboTxt comboTxt; // 콤보를 표시할 텍스트
+    public MidTxt midTxt; // 가운데 표시할 텍스트
     public BotController[] botControllers; // BotController 배열
+    public PlayerController playerController;
+    public LifeCntManager lifeCntManager;
     private int score = 0; // 점수 변수
 
     void Start()
@@ -20,6 +23,11 @@ public class GameManager : MonoBehaviour
         }
         // 점수 초기화
         comboTxt = GetComponentInChildren<ComboTxt>();
+        midTxt = GetComponentInChildren<MidTxt>();
+        lifeCntManager = GetComponentInChildren<LifeCntManager>();
+        playerController = GameObject.FindWithTag("Player").GetComponent<PlayerController>();
+        playerController.onGameOver += OnGameOver;
+        playerController.onHit += OnHit;
 
     }
 
@@ -101,5 +109,18 @@ public class GameManager : MonoBehaviour
     public void Combo()
     {
         comboTxt.UpdateCombo();
+    }
+
+    public void OnGameOver()
+    {
+        string GameOver = "Game Over";
+        midTxt.UpdateText(GameOver);
+        midTxt.ShowText();
+        Time.timeScale = 0.1f; // 게임 속도를 50%로 느리게
+
+    }
+    public void OnHit()
+    {
+        lifeCntManager.RemoveOneLife(playerController.hitCnt);
     }
 }

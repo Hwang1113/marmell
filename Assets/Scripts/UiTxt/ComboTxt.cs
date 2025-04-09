@@ -48,7 +48,7 @@ public class ComboTxt : MonoBehaviour
         if (comboText)
         {
             comboText.enabled = true;
-            comboText.text = "Combo: " + combo.ToString(); // 점수를 텍스트로 갱신
+            comboText.text = combo + "Combo".ToString(); // 점수를 텍스트로 갱신
             curTime = 0f;
         }
     }

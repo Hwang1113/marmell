@@ -5,11 +5,11 @@ public class ThirdPersonCamera : MonoBehaviour
     public string playerTag = "Player"; // 플레이어의 태그
     public Transform player; // 플레이어의 Transform
     public float rotationSpeed = 5f; // 회전 속도
-    public float distance = 5f; // 플레이어와 카메라 간의 거리
+    public float distance = 10f; // 플레이어와 카메라 간의 거리
     public float rotationDamping = 3f; // 회전 보정 속도
 
     public float minDistance = 5f; // 최소 거리
-    public float maxDistance = 12f; // 최대 거리
+    public float maxDistance = 20f; // 최대 거리
     public float zoomSpeed = 2f; // 마우스 휠로 조정할 때의 속도
 
     public string collisionTag = "Ground"; // 충돌 감지할 태그
